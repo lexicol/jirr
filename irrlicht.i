@@ -184,6 +184,7 @@ using namespace irr::io;
 %include "IGUIContextMenu.h" // IGUIElement.h
 %include "IGUIEditBox.h" // IGUIElement.h SColor.h
 %include "IGUIWindow.h" // IGUIButton.h
+%include "IGUISkin.h" // IUnknown.h SColor.h IGUISkin.h
 %include "IGUIEnvironment.h" // rect.h IUnknown.h IEventReceiver.h irrTypes.h IGUIWindow.h
 %include "IGUIFileOpenDialog.h" // IGUIElement.h
 %include "IGUIFont.h" // IUnknown.h irrTypes.h SColor.h
@@ -192,7 +193,6 @@ using namespace irr::io;
 %include "IGUIListBox.h" // IGUIElement.h irrTypes.h
 %include "IGUIMeshViewer.h" // IGUIElement.h
 %include "IGUIScrollBar.h" // IGUIElement.h
-%include "IGUISkin.h" // IUnknown.h SColor.h IGUISkin.h
 %include "IGUIStaticText.h" // IGUIElement.h SColor.h
 %include "IGUITabControl.h" // IGUIElement.h SColor.h
 %include "IGUIComboBox.h"
