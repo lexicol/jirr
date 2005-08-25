@@ -22,7 +22,7 @@ JAVA_LIBDIR=-L$(JAVA_HOME)/jre/lib/i386/client
 JAVA_CFLAGS=-I$(JAVA_INCDIR) -I$(JAVA_INCDIR)/$(OS)
 JAVA_LDFLAGS=$(JAVA_LIBDIR) -ljvm
 
-IRRLICHT_HOME=../../irrlicht-0.11.0
+IRRLICHT_HOME=../../irrlicht-0.12.0
 
 ifeq ($(OS), linux)
 IRRLICHT_LIBDIR=$(IRRLICHT_HOME)/lib/Linux
