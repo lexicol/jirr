@@ -71,8 +71,8 @@ using namespace irr::io;
 //%ignore operator=;
 %rename(assignOperator) operator=;
 %rename(assingTimesOperator) operator*=;
-%rename(assingMinusOperator) operator+=;
-%rename(assingPlusOperator) operator-=;
+%rename(assingMinusOperator) operator-=;
+%rename(assingPlusOperator) operator+=;
 %rename(assingDivideOperator) operator/=;
 
 %rename(assingIncrement) operator++;
@@ -230,7 +230,7 @@ using namespace irr::io;
 //};
 %include "IMeshLoader.h" // IUnknown.h IReadFile.h IAnimatedMesh.h
 %include "ISceneManager.h" // array.h IUnknown.h vector3d.h dimension2d.h SColor.h SMaterial.h IEventReceiver.h
-%include "ICursorControl.h" // position2d.h IUnknown.h irrTypes.h
+%include "ICursorControl.h" // position2d.h position2f.h IUnknown.h irrTypes.h
 %include "IVideoModeList.h" // IUnknown.h dimension2d.h
 %include "ITimer.h" // IUnknown.h
 %include "IOSOperator.h" // IUnknown.h
@@ -267,8 +267,6 @@ using namespace irr::io;
 
 //OAK INSERTED THIS
 %include "irrlicht.h"
-
-
 
 /*
 namespace irr
@@ -326,7 +324,7 @@ vector3df
 //%template(line2di) irr::core::line2d<s32>;
 %template(triangle3df) irr::core::triangle3d<f32>;
 //%template(triangle3di) irr::core::triangle3d<s32>;
-//%template(position2df) irr::core::position2d<f32>;
+%template(position2df) irr::core::position2d<f32>;
 %template(position2di) irr::core::position2d<s32>;
 //%template(rectf) irr::core::rect<f32>;
 %template(recti) irr::core::rect<s32>;
@@ -524,4 +522,12 @@ vector3df
 		return ((irr::core::matrix4 const *)self)->operator *((irr::core::matrix4 const &)*matrix);
 	};	
 }
-	
+
+%extend irr::core::rect<s32> {
+	//! Sets all 4 values of the rectangle (ANDI)
+	void setRect(s32 x1, s32 y1, s32 x2, s32 y2)
+	{		
+		self->UpperLeftCorner = position2d<s32>(x1, y1);
+		self->LowerRightCorner = position2d<s32>(x2, y2);
+	}
+}
