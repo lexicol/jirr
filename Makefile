@@ -22,7 +22,7 @@ JAVA_LIBDIR=-L$(JAVA_HOME)/jre/lib/i386/client
 JAVA_CFLAGS=-I$(JAVA_INCDIR) -I$(JAVA_INCDIR)/$(OS)
 JAVA_LDFLAGS=$(JAVA_LIBDIR) -ljvm
 
-IRRLICHT_HOME=../../irrlicht-0.14.0
+IRRLICHT_HOME=../../irrlicht-1.0
 
 ifeq ($(OS), linux)
 IRRLICHT_LIBDIR=$(IRRLICHT_HOME)/lib/Linux
@@ -56,7 +56,7 @@ SWIG=swig -v
 #OAK MOD_SWIG
 #SWIG=/home/emanuel/sources/apps/SWIG/swig
 
-CXXFLAGS=$(JAVA_CFLAGS) $(IRRLICHT_CFLAGS) -I. -D__cplusplus
+CXXFLAGS=$(JAVA_CFLAGS) $(IRRLICHT_CFLAGS) -I. -D__cplusplus -O3
 
 all: clean dirs jar wrapper
 
