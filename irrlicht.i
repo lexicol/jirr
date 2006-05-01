@@ -347,6 +347,10 @@ vector3df
    bool isWireframe() {return self->Wireframe;};
    bool isFlag(int material_flag) {return self->Flags[material_flag];};
    void setFlag(int material_flag, bool value) {self->Flags[material_flag] = value;};
+   void setTexture(int index, ITexture* texture)
+   {
+     self->Textures[index] = texture;
+   } 
 };
 
 %extend irr::SEvent {
@@ -515,7 +519,7 @@ vector3df
 		return Vertices;
 	}
 }
-		
+	
 %extend irr::core::matrix4 {
 	irr::core::matrix4  multiply(irr::core::matrix4 *matrix)
 	{
