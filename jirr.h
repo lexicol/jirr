@@ -219,7 +219,10 @@ namespace irr
 		{
 			return (IGUIFileOpenDialog*) guiElement;
 		}		
-		
+		IGUIComboBox* castToIGUIComboBox(IGUIElement *guiElement)
+		{
+			return (IGUIComboBox*) guiElement;
+		}		
 	}
 }
 

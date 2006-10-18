@@ -138,6 +138,10 @@ using namespace irr::io;
 %clear void *;
 %clear unsigned short *;
 %include "IMesh.h" // IUnknown.h IMeshBuffer.h
+
+// 1.1
+%include "IMeshCache.h"
+
 //%apply irr::scene::IMesh *& INPUT {irr::scene::IMesh *&};
 //%apply irr::scene::IMesh *& OUTPUT {irr::scene::IMesh *&};
 //%clear irr::scene::IMesh *&;
@@ -148,6 +152,10 @@ using namespace irr::io;
 %include "ISceneNodeAnimator.h" // IUnknown.h vector3d.h
 %include "ITriangleSelector.h" // IUnknown triangle3d.h aabbox3d.h matrix4.h
 
+// 1.1
+%include "IAttributes.h"
+%include "IAttributeExchangingObject.h"
+
 %feature("director") irr::scene::ISceneNode;
 %feature("director") irr::scene::ISceneNode::OnPreRender;
 %feature("director") irr::scene::ISceneNode::OnPostRender;
@@ -155,8 +163,13 @@ using namespace irr::io;
 %feature("director") irr::scene::ISceneNode::getBoundingBox;
 %feature("director") irr::scene::ISceneNode::getMaterialCount;
 %feature("director") irr::scene::ISceneNode::getMaterial;
+%feature("director") irr::scene::ISceneNode::OnReadUserData;
+%feature("director") irr::scene::ISceneNode::createUserData;
 %feature("nodirector") irr::scene::ISceneNode::setName;
 %include "ISceneNode.h" // IUnknown.h ISceneNodeAnimator.h ITriangleSelector.h SMaterial.h irrString.h aabbox3d.h matrix4.h irrList.h
+
+// 1.1
+%include "IMeshSceneNode.h"
 
 //%apply irr::scene::ISceneNode *& INPUT {irr::scene::ISceneNode *&};
 //%clear irr::scene::ISceneNode *&;
@@ -210,6 +223,9 @@ using namespace irr::io;
 %include "IGPUProgrammingServices.h"
 
 %apply float[] {float *};
+//1.1
+%include "IMaterialRendererServices.h"
+
 %include "IMaterialRenderer.h" // 0.9
 %clear float *;
 
@@ -248,6 +264,10 @@ using namespace irr::io;
 %include "SMesh.h" // IMeshBuffer.h IMesh.h
 %include "IWriteFile.h"
 
+// 1.1
+%include "ISceneNodeFactory.h"
+%include "ISceneNodeAnimatorFactory.h"
+
 //%feature("director") irr::SEventQueue; 
 %include "jirr.h"
 
@@ -262,7 +282,13 @@ using namespace irr::io;
 %include "SIrrCreationParameters.h" // 1.0
 
 %include "IShaderConstantSetCallBack.h" // 0.9
-%include "IStringParameters.h" // 0.9
+//%include "IStringParameters.h" // 0.9
+
+// 1.1
+%feature("director") irr::video::ISceneUserDataSerializer;
+%feature("director") irr::video::ISceneUserDataSerializer::OnReadUserData;
+%feature("director") irr::video::ISceneUserDataSerializer::createUserData;
+//%include "ISceneUserDataSerializer.h"
 
 
 //OAK INSERTED THIS
@@ -535,3 +561,5 @@ vector3df
 		self->LowerRightCorner = position2d<s32>(x2, y2);
 	}
 }
+
+
