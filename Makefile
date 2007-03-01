@@ -104,10 +104,15 @@ dirs:
 	-mkdir -p classes
 	-mkdir -p lib
 
+javadoc:
+	mkdir javadoc
+	"$(JAVA_HOME)"/bin/javadoc -sourcepath src/java -d javadoc net.sf.jirr
+
 clean:
 	rm -rf src/native/*
 	rm -rf src/java/net/sf/jirr/*
 	rm -rf classes/*
 	rm -rf lib/*
+	rm -rf javadoc/*	
 	rm -f $(shell find net/sf/jirr -name "*.class")
 

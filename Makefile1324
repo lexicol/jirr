@@ -50,14 +50,7 @@ else
 IRRLICHT_CFLAGS=-I$(IRRLICHT_INCDIR)
 endif
 
-#SWIG=swig -I/mingw/lib/swig1.3 -I/mingw/lib/swig1.3/java
-#SWIG=swig -dump_tree 
-#SWIG=swig -v 
-SWIG=/cygdrive/n/ottools/swig/SWIG-1.3.24/swig.exe -v
-#SWIG=swig -v -includeall -I/usr/lib/gcc/i686-pc-mingw32/3.4.1/include/ -I/usr/include/
-#SWIG=swig -v -includeall  -I/usr/include/mingw/ -I/usr/lib/gcc/i686-pc-mingw32/3.4.1/include/ -I/usr/include/sys -I/usr/include/
-#OAK MOD_SWIG
-#SWIG=/home/emanuel/sources/apps/SWIG/swig
+SWIG=/cygdrive/c/tools/swig/SWIG-1.3.24/swig.exe -v
 
 CXXFLAGS=$(JAVA_CFLAGS) $(IRRLICHT_CFLAGS) -I. -D__cplusplus -O3 -fno-strict-aliasing
 #CXXFLAGS=$(JAVA_CFLAGS) $(IRRLICHT_CFLAGS) -I. -D__cplusplus 
@@ -103,6 +96,10 @@ dirs:
 	-mkdir -p src/native
 	-mkdir -p classes
 	-mkdir -p lib
+
+javadoc:
+	mkdir javadoc
+	"$(JAVA_HOME)"/bin/javadoc -sourcepath src/java -d javadoc net.sf.jirr
 
 clean:
 	rm -rf src/native/*
