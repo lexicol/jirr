@@ -31,7 +31,6 @@ using namespace irr::scene;
 using namespace irr::gui;
 using namespace irr::core;
 using namespace irr::io;
-
 %}
 
 %ignore irr::gui::createSkin;
@@ -70,13 +69,13 @@ using namespace irr::io;
 
 //%ignore operator=;
 %rename(assignOperator) operator=;
-%rename(assingTimesOperator) operator*=;
-%rename(assingMinusOperator) operator-=;
-%rename(assingPlusOperator) operator+=;
-%rename(assingDivideOperator) operator/=;
+%rename(assignTimesOperator) operator*=;
+%rename(assignMinusOperator) operator-=;
+%rename(assignPlusOperator) operator+=;
+%rename(assignDivideOperator) operator/=;
 
-%rename(assingIncrement) operator++;
-%rename(assingDecrement) operator--;
+%rename(assignIncrement) operator++;
+%rename(assignDecrement) operator--;
 
 
 // RENAMING OF CONST-VARIANTS (and ignoring fields that would generate conflicting getters)
@@ -100,6 +99,7 @@ using namespace irr::io;
 
 
 // The include of irrlicht header-files
+%include "IrrCompileConfig.h" // 1.2
 %include "irrMath.h"
 %include "irrArray.h" 
 %include "vector2d.h"
@@ -124,9 +124,11 @@ using namespace irr::io;
 %include "S3DVertex.h"
 %include "EDriverTypes.h"
 %include "IUnknown.h"
+%include "ILogger.h" // IUnknown.h
 %include "IImage.h"
 %include "ITexture.h"
 %include "SMaterial.h"
+%include "SceneParameters.h"
 
 %include "irrXML.h"
 %include "IXMLReader.h"
@@ -139,22 +141,29 @@ using namespace irr::io;
 %clear unsigned short *;
 %include "IMesh.h" // IUnknown.h IMeshBuffer.h
 
+// 1.2
+%include "ETerrainElements.h"
+%include "ESceneNodeTypes.h"
+
 // 1.1
 %include "IMeshCache.h"
+// 1.1
+%include "IAttributes.h"
+%include "IAttributeExchangingObject.h"
 
 //%apply irr::scene::IMesh *& INPUT {irr::scene::IMesh *&};
 //%apply irr::scene::IMesh *& OUTPUT {irr::scene::IMesh *&};
 //%clear irr::scene::IMesh *&;
 %include "IAnimatedMesh.h" // IUnknown.h IMesh.h matrix4.h
+%include "IAnimatedMeshB3d.h" // IAnimatedMesh.h
 %include "IAnimatedMeshMD2.h" // IAnimatedMesh.h
 %include "IAnimatedMeshMS3D.h" // IAnimatedMesh.h
-%include "IAnimatedMeshX.h" // IAnimatedMesh.h
 %include "ISceneNodeAnimator.h" // IUnknown.h vector3d.h
 %include "ITriangleSelector.h" // IUnknown triangle3d.h aabbox3d.h matrix4.h
 
-// 1.1
-%include "IAttributes.h"
-%include "IAttributeExchangingObject.h"
+%feature("director") irr::IEventReceiver; 
+%feature("director") irr::IEventReceiver::OnEvent; 
+%include "IEventReceiver.h" // ILogger.h position2d.h Keycodes.h
 
 %feature("director") irr::scene::ISceneNode;
 %feature("director") irr::scene::ISceneNode::OnPreRender;
@@ -162,11 +171,17 @@ using namespace irr::io;
 %feature("director") irr::scene::ISceneNode::render;
 %feature("director") irr::scene::ISceneNode::getBoundingBox;
 %feature("director") irr::scene::ISceneNode::getMaterialCount;
-%feature("director") irr::scene::ISceneNode::getMaterial;
+//%feature("director") irr::scene::ISceneNode::getMaterial;
 %feature("director") irr::scene::ISceneNode::OnReadUserData;
 %feature("director") irr::scene::ISceneNode::createUserData;
 %feature("nodirector") irr::scene::ISceneNode::setName;
+%feature("nodirector") irr::scene::ISceneNode::getName;
+//%feature("nodirector") irr::scene::ISceneNode::getBoundingBox;
+%feature("nodirector") irr::scene::ISceneNode::getMaterial;
+%feature("nodirector") irr::scene::ISceneNode::getTriangleSelector;
+%include "ISceneManager.h" //irrArray.h, IUnknown.h vector3d.h dimension2d.h SColor.h  SMaterial.h IEventReceiver.h ETerrainElements.h ESceneNodeTypes.h SceneParameters.h
 %include "ISceneNode.h" // IUnknown.h ISceneNodeAnimator.h ITriangleSelector.h SMaterial.h irrString.h aabbox3d.h matrix4.h irrList.h
+%include "IAnimatedMeshX.h" // IAnimatedMesh.h
 
 // 1.1
 %include "IMeshSceneNode.h"
@@ -177,11 +192,6 @@ using namespace irr::io;
 %include "IAnimatedMeshSceneNode.h"; // ISceneNode.h IAnimatedMeshMD2.h IShadowVolumeSceneNode.h
 //%include "ITextSceneNode.h" 
 //%include "IBspTreeSceneNode.h" // ISceneNode.h IMesh.h
-%include "ILogger.h" // IUnknown.h
-
-%feature("director") irr::IEventReceiver; 
-%feature("director") irr::IEventReceiver::OnEvent; 
-%include "IEventReceiver.h" // ILogger.h position2d.h Keycodes.h
 
 %include "SViewFrustrum.h" // plane3d.h vector3d.h aabbox3d.h matrix4.h
 %include "ICameraSceneNode.h" // SViewFrustrum.h ISceneNode.h IEventReceiver.h
@@ -210,6 +220,7 @@ using namespace irr::io;
 %include "IGUITabControl.h" // IGUIElement.h SColor.h
 %include "IGUIComboBox.h"
 %include "IGUIToolbar.h"
+%include "IGUIColorSelectDialog.h"
 %include "ILightSceneNode.h" // ISceneNode.h SLight.h
 %include "IMeshManipulator.h" // IUnknown.h vector3d.h IMeshBuffer.h aabbox3d.h
 %include "IMetaTriangleSelector.h" // ITriangleSelector.h
@@ -357,6 +368,8 @@ vector3df
 %template(ITextureArray) irr::core::array<irr::video::ITexture *>;
 //%template(ISceneNodeList) irr::core::list<irr::scene::ISceneNode *>;
 %template(IMeshArray) irr::core::array<irr::scene::IMesh *>;
+%template(S3DVertexArray) irr::core::array<irr::video::S3DVertex *>;
+%template(u16Array) irr::core::array<u16>;
 //%template(IGUIElementList) irr::core::list<irr::gui::IGUIElement *>;
 //%template(IGUIElementListIterator) irr::core::Iterator<irr::gui::IGUIElement *>;
 //%template(ISceneNodeListIterator) irr::core::Iterator<irr::scene::ISceneNode *>;
@@ -377,7 +390,7 @@ vector3df
    {
      self->Textures[index] = texture;
    } 
-};
+}
 
 %extend irr::SEvent {
    int getKeyInputChar() {return self->KeyInput.Char;};
@@ -401,7 +414,50 @@ vector3df
 	s32 getUserEventData1() {return self->UserEvent.UserData1;};
 	s32 getUserEventData2() {return self->UserEvent.UserData2;};
 	f32 getUserEventData3() {return self->UserEvent.UserData3;};
-};
+}
+
+
+//%extend irr::scene::SMeshBuffer {
+//   void setMaterial(video::SMaterial* newMaterial)
+//   {
+//      self->Material = newMaterial;
+//   }
+//   void setVertices(core::array<video::S3DVertex>* newVertices)
+//   {
+//      Vertices= newVertices;
+//   }
+//   void setIndices(core::array<u16>* newIndices)
+//   {
+//      self->Indices = newIndices;
+//   }
+//   void setBoundingBox(core::aabbox3d<f32>* newBoundingBox)
+//   {
+//      self->BoundingBox = newBoundingBox;
+//   }
+//};
+%extend irr::scene::SMeshBuffer {
+
+   void setMaterial(video::SMaterial& newMaterial)
+   {
+      self->Material = newMaterial;
+   }
+   void setIndices(core::array<u16> &newIndices)
+   {
+      self->Indices = newIndices;
+   }
+   void setBoundingBox(core::aabbox3d<f32>& newBoundingBox)
+   {
+      self->BoundingBox = newBoundingBox;
+   }
+//   void setVertices2(S3DVertexArray newVertices)
+//   {
+//      self->Vertices = newVertices;
+//   }
+   void setVertices(irr::core::array<irr::video::S3DVertex> &newVertices )
+   {
+      self->Vertices = newVertices;
+   }
+}
 
 %extend irr::video::IVideoDriver {
 	//nosuccess
@@ -448,9 +504,9 @@ vector3df
 	void addToVertices(S3DVertex *vertices, S3DVertex *vertex, int pos)
 	{
 		S3DVertex *array = vertices;
-      *(void **)&array[pos] = vertex;
+	      *(void **)&array[pos] = vertex;
 	};
-};
+}
 
 %extend irr::scene::ISceneManager {
 	//nosuccess
@@ -525,18 +581,28 @@ vector3df
 	{
 		self->setMaterialType((E_MATERIAL_TYPE)type);
 	}
+
+//	virtual void setScale2(const core::vector3df v3df)
+//	{
+//	//		self->ISceneNode::setScale(v3df);
+//                core::vector3df vector;
+//		vector.X = 1;
+//		vector.Y = 1.0;
+//		vector.Z = 1;
+//		self->ISceneNode::setScale(vector);
+//	}
 	
 	void OnPreRenderFromJava()
 	{
 		// no directors for this method
 		self->ISceneNode::OnPreRender();
-	};
+	}
 	
 	//nosuccess
 	irr::video::S3DVertex * getDefaultVertices()
 	{
 		S3DVertex Vertices[4];
-		
+
 		Vertices[0] = video::S3DVertex(0,0,10, 1,1,0, video::SColor(255,0,255,255), 0, 1);
 		Vertices[1] = video::S3DVertex(10,0,-10, 1,0,0, video::SColor(255,255,0,255), 1, 1);
 		Vertices[2] = video::S3DVertex(0,20,0, 0,1,1, video::SColor(255,255,255,0), 1, 0);
@@ -550,7 +616,7 @@ vector3df
 	irr::core::matrix4  multiply(irr::core::matrix4 *matrix)
 	{
 		return ((irr::core::matrix4 const *)self)->operator *((irr::core::matrix4 const &)*matrix);
-	};	
+	}
 }
 
 %extend irr::core::rect<s32> {

@@ -22,7 +22,7 @@ JAVA_LIBDIR=-L"$(JAVA_HOME)"/jre/lib/i386/client
 JAVA_CFLAGS=-I$(JAVA_INCDIR) -I$(JAVA_INCDIR)/$(OS)
 JAVA_LDFLAGS=$(JAVA_LIBDIR) -ljvm
 
-IRRLICHT_HOME=../../irrlicht-1.1
+IRRLICHT_HOME=../../irrlicht-1.2
 
 ifeq ($(OS), linux)
 IRRLICHT_LIBDIR=$(IRRLICHT_HOME)/lib/Linux
@@ -52,17 +52,21 @@ endif
 
 #SWIG=swig -I/mingw/lib/swig1.3 -I/mingw/lib/swig1.3/java
 #SWIG=swig -dump_tree 
-SWIG=swig -v
+SWIG=swig -v 
+#SWIG=/cygdrive/n/ottools/swig/swigwin-1.3.31/swig.exe -v
+#SWIG=swig -v -includeall -I/usr/lib/gcc/i686-pc-mingw32/3.4.1/include/ -I/usr/include/
+#SWIG=swig -v -includeall  -I/usr/include/mingw/ -I/usr/lib/gcc/i686-pc-mingw32/3.4.1/include/ -I/usr/include/sys -I/usr/include/
 #OAK MOD_SWIG
 #SWIG=/home/emanuel/sources/apps/SWIG/swig
 
-CXXFLAGS=$(JAVA_CFLAGS) $(IRRLICHT_CFLAGS) -I. -D__cplusplus -O3
+CXXFLAGS=$(JAVA_CFLAGS) $(IRRLICHT_CFLAGS) -I. -D__cplusplus -O3 -fno-strict-aliasing
+#CXXFLAGS=$(JAVA_CFLAGS) $(IRRLICHT_CFLAGS) -I. -D__cplusplus 
 
 all: clean dirs jar wrapper
 
 src/java/net/sf/jirr/Irrlicht.java: $(IRRLICHT_INCDIR)/irrlicht.h irrlicht.i
 	-$(SWIG) -package net.sf.jirr -c++ -I$(IRRLICHT_INCDIR) -java -outdir src/java/net/sf/jirr -o src/native/irrlicht_wrap.cxx irrlicht.i
-	patch -p1 <diff.txt
+#	patch -p1 <diff.txt
 
 classes/net/sf/jirr/Irrlicht.class: src/java/net/sf/jirr/Irrlicht.java
 	$(JAVAC) -sourcepath src/java -d classes $(shell find src/java -name "*.java")
