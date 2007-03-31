@@ -8,9 +8,28 @@
 %include "carrays.i"
 %include "temp_arrays.i"
 
+//%include "swigwarnings.swg"
+%define SWIGWARN_TYPEMAP_THREAD_UNSAFE_MSG    "470:Thread/reentrant unsafe wrapping, consider returning by value instead." %enddef
+
+// java 1.5 enums - otherwise patching cpp will be like ....
+%include "enums.swg"
+%javaconst(1);
+%javaconstvalue("0x80000000l") F32_SIGN_BIT;
+%javaconstvalue("0x7FFFFFFFl") F32_EXPON_MANTISSA;
+%javaconstvalue("E_TRANSFORMATION_STATE.ETS_PROJECTION.swigValue()+1") ETS_VIEW_PROJECTION_3;
+%javaconstvalue("EDS_BBOX.swigValue()|EDS_NORMALS.swigValue()|EDS_SKELETON.swigValue()|EDS_MESH_WIRE_OVERLAY.swigValue()") EDS_FULL;
+//%javaconstvalue("{0.f,0.1f,0.01f,0.001f,0.0001f,0.00001f,0.000001f,0.0000001f,0.00000001f,0.000000001f,0.0000000001f,0.00000000001f,0.000000000001f,0.0000000000001f,0.00000000000001f,0.000000000000001f};") float fast_atof_table[];
+
 JAVA_P_ARRAYSOFCLASSES(S3DVERTEXARRAY, void, irr::video::S3DVertex, S3DVertex, getVertexCount ())
+//JAVA_P_ARRAYSOFCLASSES(S3DVERTEXIRRARRAY, void, irr::video::S3DVertex, S3DVertex, getVertexCount ())
 JAVA_P_ARRAYS_TYPEMAPS(INDEXARRAY, unsigned short, jint, jintArray, int, Ushort, "[I", getIndexCount ())
-TEMPJAVA_P_ARRAYSOFCLASSES(S3DVERTEXARRAY2, void, irr::video::S3DVertex, S3DVertex)
+//TEMPJAVA_P_ARRAYSOFCLASSES(S3DVERTEXARRAY2, void, irr::video::S3DVertex, S3DVertex)
+JAVA_ARRAYSOFCLASSES(irr::video::S3DVertex)
+JAVA_ARRAYSOFCLASSES(irr::video::S3DVertex2TCoords)
+JAVA_ARRAYSOFCLASSES(irr::video::S3DVertexTangents)
+JAVA_ARRAYSOFCLASSES(irr::video::SColor)
+JAVA_ARRAYSOFCLASSES(irr::SKeyMap)
+//JAVA_ARRAYSOFCLASSES(irr::core::matrix4)
 
 POINTER_REF_TYPEMAP(irr::video::S3DVertex *, S3DVertex)
 POINTER_REF_TYPEMAP(irr::scene::ISceneNode *, ISceneNode)
@@ -24,6 +43,7 @@ POINTER_REF_TYPEMAP(irr::video::IMaterialRenderer *, IMaterialRenderer)
 #include <irrlicht.h>
 #include <IMeshLoader.h>
 #include <IGPUProgrammingServices.h>
+#include "IGUIElementFactory.h"
 #include "jirr.h"
 using namespace irr;
 using namespace irr::video;
@@ -44,12 +64,6 @@ using namespace irr::io;
 %ignore irr::io::createIrrXMLReaderUTF16;
 %ignore irr::io::createIrrXMLReaderUTF32;
 
-//%ignore (IGPUProgrammingServices::addShaderMaterialFromFiles(irr::io::IReadFile*,irr::io::IReadFile*,irr::video::IShaderConstantSetCallBack*,irr::video::E_MATERIAL_TYPE));
-//%rename (irr::video::IGPUProgrammingServices::addShaderMaterialFromFiles(irr::io::IReadFile*,irr::io::IReadFile*,irr::video::IShaderConstantSetCallBack*,irr::video::E_MATERIAL_TYPE)) addShaderMaterialFromFilesIoRead;
-
-%include "irrTypes.h"
-//%feature("director") irr::scene::ISceneNodeAnimator::animateNode;
-
 // RENAMING OF OPERATORS
 %rename(subtractOperator) operator-;
 %rename(addOperator) operator+;
@@ -65,9 +79,7 @@ using namespace irr::io;
 
 %ignore operator[];
 %ignore operator();
-//%rename(parenthesisOperator) operator();
 
-//%ignore operator=;
 %rename(assignOperator) operator=;
 %rename(assignTimesOperator) operator*=;
 %rename(assignMinusOperator) operator-=;
@@ -76,7 +88,6 @@ using namespace irr::io;
 
 %rename(assignIncrement) operator++;
 %rename(assignDecrement) operator--;
-
 
 // RENAMING OF CONST-VARIANTS (and ignoring fields that would generate conflicting getters)
 %rename(getMaterialConst) getMaterial() const;
@@ -92,31 +103,69 @@ using namespace irr::io;
 %ignore(*::log(const c8*, ELOG_LEVEL));
 %ignore(*::log(const c8*, const c8*));
 %ignore(*::log(const c8*));
+%rename(getF32PointerConst) pointer() const; // 1.3
+%rename(getTextureMatrixConst) getTextureMatrix(u32 i) const; // 1.3
+%rename(getCreateableGUIElementTypeNameByType) getCreateableGUIElementTypeName(irr::gui::EGUI_ELEMENT_TYPE type); // 1.3
+%rename(getCreateableSceneNodeTypeNameByType)  getCreateableSceneNodeTypeName(irr::scene::ESCENE_NODE_TYPE type) const; // 1.3
+%rename(addString_C8_WChar)  addString(const c8* attributeName, const wchar_t* value); // 1.3
+%rename(setAttribute_C8_WChar)  setAttribute(const c8* attributeName, const wchar_t* value); // 1.3
+%rename(setAttribute_C8_WChar)  setAttribute(const c8* attributeName, const wchar_t* value); // 1.3
+%rename(setAttribute_S32_WChar) setAttribute(s32 index, const wchar_t* value); // 1.3
+%rename(setAttribute_S32_C8) setAttribute(s32 index, const c8* value); // 1.3
 
-
-// OAKHACK (just make stuff WORK)
-//%ignore irr::core::list::begin();
-
+// ignore 1.3 enums
+%ignore(*::IdentityMatrix);
+// 1.3 missing references
+%ignore irr::video::SColorHSL::setfromRGB;
+%ignore irr::core::matrix4::operator=(const f32 scalar);
 
 // The include of irrlicht header-files
+%include "irrTypes.h"
+
+//todo: breaks enums in plane3d and matrix4//
+//%include "IrrMap.h" // 1.3
+
+%include "EGUIElementTypes.h" // 1.3
 %include "IrrCompileConfig.h" // 1.2
 %include "irrMath.h"
+
+%typemap(out) float []
+%{$result = SWIG_JavaArrayOutFloat(jenv, $1, 16); %}
+%include "fast_atof.h"
+%typemap(out) float []
+%{$result = SWIG_JavaArrayOutFloat(jenv, $1, FillMeInAsSizeCannotBeDeterminedAutomatically); %}
+
 %include "irrArray.h" 
-%include "vector2d.h"
 %include "vector3d.h"
+%include "vector2d.h"
+
 %include "plane3d.h"
+
 %include "line3d.h"
 %include "aabbox3d.h"
 %include "heapsort.h"
 %include "dimension2d.h"
 %include "irrString.h"
+%include "coreutil.h" // 1.3
 %include "line2d.h"
 %include "irrList.h"
-%include "matrix4.h"
 %include "triangle3d.h"
 %include "position2d.h"
-%include "quaternion.h"
 %include "rect.h"
+
+//%apply float[] { float * };
+//%apply irr::core::matrix4[] {irr::core::matrix4 *};
+%typemap(out) float []
+%{$result = SWIG_JavaArrayOutFloat(jenv, $1, 16); %}
+%apply irr::f32[] {irr::f32 *};
+%include "matrix4.h"
+%clear irr::f32 *;
+%typemap(out) float []
+%{$result = SWIG_JavaArrayOutFloat(jenv, $1, FillMeInAsSizeCannotBeDeterminedAutomatically); %}
+//clear irr::core::matrix4 *;
+//clear float *;
+
+%include "quaternion.h"
 %include "Keycodes.h"
 %include "SColor.h"
 %include "SLight.h"
@@ -129,6 +178,7 @@ using namespace irr::io;
 %include "ITexture.h"
 %include "SMaterial.h"
 %include "SceneParameters.h"
+%include "IGUIElementFactory.h" // 1.3
 
 %include "irrXML.h"
 %include "IXMLReader.h"
@@ -137,8 +187,9 @@ using namespace irr::io;
 %apply void *S3DVERTEXARRAY { void * };
 %apply unsigned short *INDEXARRAY { unsigned short * };
 %include "IMeshBuffer.h" // IUnknown.h SMaterial.h array.h aabbox3d.h S3DVertex.h
-%clear void *;
 %clear unsigned short *;
+%clear void *;
+
 %include "IMesh.h" // IUnknown.h IMeshBuffer.h
 
 // 1.2
@@ -151,9 +202,6 @@ using namespace irr::io;
 %include "IAttributes.h"
 %include "IAttributeExchangingObject.h"
 
-//%apply irr::scene::IMesh *& INPUT {irr::scene::IMesh *&};
-//%apply irr::scene::IMesh *& OUTPUT {irr::scene::IMesh *&};
-//%clear irr::scene::IMesh *&;
 %include "IAnimatedMesh.h" // IUnknown.h IMesh.h matrix4.h
 %include "IAnimatedMeshB3d.h" // IAnimatedMesh.h
 %include "IAnimatedMeshMD2.h" // IAnimatedMesh.h
@@ -166,42 +214,38 @@ using namespace irr::io;
 %include "IEventReceiver.h" // ILogger.h position2d.h Keycodes.h
 
 %feature("director") irr::scene::ISceneNode;
-%feature("director") irr::scene::ISceneNode::OnPreRender;
-%feature("director") irr::scene::ISceneNode::OnPostRender;
+%feature("director") irr::scene::ISceneNode::OnRegisterSceneNode;
+%feature("director") irr::scene::ISceneNode::OnAnimate;
 %feature("director") irr::scene::ISceneNode::render;
 %feature("director") irr::scene::ISceneNode::getBoundingBox;
 %feature("director") irr::scene::ISceneNode::getMaterialCount;
-//%feature("director") irr::scene::ISceneNode::getMaterial;
+
 %feature("director") irr::scene::ISceneNode::OnReadUserData;
 %feature("director") irr::scene::ISceneNode::createUserData;
 %feature("nodirector") irr::scene::ISceneNode::setName;
 %feature("nodirector") irr::scene::ISceneNode::getName;
-//%feature("nodirector") irr::scene::ISceneNode::getBoundingBox;
+
 %feature("nodirector") irr::scene::ISceneNode::getMaterial;
 %feature("nodirector") irr::scene::ISceneNode::getTriangleSelector;
+%apply irr::SKeyMap[] { irr::SKeyMap * };
 %include "ISceneManager.h" //irrArray.h, IUnknown.h vector3d.h dimension2d.h SColor.h  SMaterial.h IEventReceiver.h ETerrainElements.h ESceneNodeTypes.h SceneParameters.h
+%clear irr::SKeyMap *;
 %include "ISceneNode.h" // IUnknown.h ISceneNodeAnimator.h ITriangleSelector.h SMaterial.h irrString.h aabbox3d.h matrix4.h irrList.h
 %include "IAnimatedMeshX.h" // IAnimatedMesh.h
 
 // 1.1
 %include "IMeshSceneNode.h"
 
-//%apply irr::scene::ISceneNode *& INPUT {irr::scene::ISceneNode *&};
-//%clear irr::scene::ISceneNode *&;
 %include "IShadowVolumeSceneNode.h"; // ISceneNode.h IMesh.h
 %include "IAnimatedMeshSceneNode.h"; // ISceneNode.h IAnimatedMeshMD2.h IShadowVolumeSceneNode.h
-//%include "ITextSceneNode.h" 
-//%include "IBspTreeSceneNode.h" // ISceneNode.h IMesh.h
 
-%include "SViewFrustrum.h" // plane3d.h vector3d.h aabbox3d.h matrix4.h
+%include "SViewFrustum.h" // plane3d.h vector3d.h aabbox3d.h matrix4.h
 %include "ICameraSceneNode.h" // SViewFrustrum.h ISceneNode.h IEventReceiver.h
 %include "IDummyTransformationSceneNode.h" // ISceneNode.h
 %include "IFileList.h" // IUnknown.h
 %include "IFileSystem.h" // IUnknown.h
 %include "IGUIElement.h" // IUnknown.h irrList.h rect.h irrString.h IEventReceiver.h
-//%apply irr::gui::IGUIElement *& INPUT {irr::gui::IGUIElement *&};
 
-//%clear irr::gui::IGUIElement *&;
 %include "IGUIButton.h" // IGUIElement.h
 %include "IGUICheckBox.h" // IGUIElement.h
 %include "IGUIContextMenu.h" // IGUIElement.h
@@ -221,12 +265,14 @@ using namespace irr::io;
 %include "IGUIComboBox.h"
 %include "IGUIToolbar.h"
 %include "IGUIColorSelectDialog.h"
+%include "IGUISpriteBank.h" // 1.3
+%include "IGUIFontBitmap.h" // 1.3
+
 %include "ILightSceneNode.h" // ISceneNode.h SLight.h
 %include "IMeshManipulator.h" // IUnknown.h vector3d.h IMeshBuffer.h aabbox3d.h
 %include "IMetaTriangleSelector.h" // ITriangleSelector.h
 %include "IReadFile.h" // IUnknown.h
 %include "IImageLoader.h" // IUnknown.h IReadFile.h IImage.h
-
 
 %feature("director") irr::video::IShaderConstantSetCallBack;
 %feature("director") irr::video::IShaderConstantSetCallBack::OnSetConstants;
@@ -236,25 +282,21 @@ using namespace irr::io;
 %apply float[] {float *};
 //1.1
 %include "IMaterialRendererServices.h"
-
 %include "IMaterialRenderer.h" // 0.9
 %clear float *;
 
-//%apply void *S3DVERTEXARRAY2 { S3DVertex * };
 %apply unsigned short[] {unsigned short *};
-//%apply irr::video::S3DVertex[] {irr::video::S3DVertex *};
-//%apply void * irr::video::S3DVertex { void * };
-//virtual void irr::video::IVideoDriver::drawIndexedTriangleList(irr::video::S3DVertex *INPUT[], s32 INPUT, const u16 *INPUT, s32 INPUT);
+%apply irr::video::S3DVertexTangents[] {irr::video::S3DVertexTangents *};
+%apply irr::video::S3DVertex2TCoords[] {irr::video::S3DVertex2TCoords *};
+%apply irr::video::S3DVertex[] {irr::video::S3DVertex *};
+%apply irr::video::SColor[] {irr::video::SColor *};
 %include "IVideoDriver.h" // rect.h SColor.h ITexture.h matrix4.h dimension2d.h position2d.h IReadFile.h SMaterial.h SLight.h IImageLoader.h triangle3d.h
-
-//%clear irr::video::S3DVertex *;
+%clear irr::video::SColor *;
+%clear const irr::video::S3DVertex *;
+%clear const irr::video::S3DVertex2TCoords *;
+%clear const irr::video::S3DVertexTangents *;
 %clear unsigned short *;
-//%clear S3DVertex *;
-//%extend irr::SEvent {
-//   int getKeyInputChar() {return self->KeyInput.Char;};
-//   bool isKeyInputPressedDown() {return self->KeyInput.PressedDown;};
-//   EMOUSE_INPUT_EVENT getMouseInputEvent() {return self->MouseInput.Event;};
-//};
+
 %include "IMeshLoader.h" // IUnknown.h IReadFile.h IAnimatedMesh.h
 %include "ISceneManager.h" // array.h IUnknown.h vector3d.h dimension2d.h SColor.h SMaterial.h IEventReceiver.h
 %include "ICursorControl.h" // position2d.h position2f.h IUnknown.h irrTypes.h
@@ -279,46 +321,55 @@ using namespace irr::io;
 %include "ISceneNodeFactory.h"
 %include "ISceneNodeAnimatorFactory.h"
 
-//%feature("director") irr::SEventQueue; 
+// 1.3
+%include "IQ3Shader.h"
+%include "IAnimatedMeshMD3.h"
+
+//// 
+
+%typemap(out) signed char []
+%{$result = SWIG_JavaArrayOutSchar(jenv, $1, arg2.Height*arg2.Width); %}
+%typemap(out) unsigned int []
+%{$result = SWIG_JavaArrayOutUint(jenv, $1, arg2.Height*arg2.Width); %}
+%typemap(out) int []
+%{$result = SWIG_JavaArrayOutInt(jenv, $1, arg2.Height*arg2.Width); %}
+%apply irr::video::SColor[] {irr::video::SColor *};
+%apply signed char[] {signed char *};
+%apply unsigned int[] {unsigned int *};
+%apply int[] {int *};
 %include "jirr.h"
+%clear signed char*;
+%clear unsigned int*;
+%clear  int*;
+%clear irr::video::SColor *;
+%typemap(out) signed char []
+%{$result = SWIG_JavaArrayOutSchar(jenv, $1, FillMeInAsSizeCannotBeDeterminedAutomatically); %}
+%typemap(out) unsigned int []
+%{$result = SWIG_JavaArrayOutUint(jenv, $1, FillMeInAsSizeCannotBeDeterminedAutomatically); %}
+%typemap(out) int []
+%{$result = SWIG_JavaArrayOutInt(jenv, $1, FillMeInAsSizeCannotBeDeterminedAutomatically); %}
 
 %apply void *S3DVERTEXARRAY { void * };
 %apply unsigned short *INDEXARRAY { unsigned short * };
 %include "SMeshBuffer.h" // array.h IMeshBuffer.h
 %include "SMeshBufferLightMap.h" // array.h IMeshBuffer.h
 %include "SMeshBufferTangents.h" // array.h IMeshBuffer.h // 0.9
-%clear void *;
 %clear unsigned short *;
+%clear void *;
 
 %include "SIrrCreationParameters.h" // 1.0
 
 %include "IShaderConstantSetCallBack.h" // 0.9
-//%include "IStringParameters.h" // 0.9
 
 // 1.1
 %feature("director") irr::video::ISceneUserDataSerializer;
 %feature("director") irr::video::ISceneUserDataSerializer::OnReadUserData;
 %feature("director") irr::video::ISceneUserDataSerializer::createUserData;
-//%include "ISceneUserDataSerializer.h"
 
 
 //OAK INSERTED THIS
 %include "irrlicht.h"
 
-/*
-namespace irr
-{
-	// IRRLICHT_API
-	IrrlichtDevice* createDevice(
-		video::EDriverType deviceType = video::EDT_SOFTWARE, 
-		const core::dimension2d<s32>& windowSize = core::dimension2d<s32>(640,480),
-		u32 bits = 16,
-		bool fullscreen = false,
-		bool stencilbuffer=false,
-		IEventReceiver* receiver = 0,
-		const wchar_t* sdk_version_do_not_use = IRRLICHT_SDK_VERSION);
-}
-*/
 
 // Templates (to make sure we get often used classes)
 %template(vector2df) irr::core::vector2d<f32>;
@@ -333,28 +384,10 @@ namespace irr
 %template(aabbox3df) irr::core::aabbox3d<f32>;
 //%template(aabbox3di) irr::core::aabbox3d<s32>;
 
-//template(vector3df) bool operator<(vector3df other) {return X<other.X && Y<other.Y && Z<other.Z;}
-/*%header %{
-irr::core::vector3d<T>
-{
-	bool operator< (const irr::core::vector3d<T> &other) const { return X<other.X && Y<other.Y && Z<other.Z;};
-}
-%}*/
-/*%include %{
-irr::core::vector3df
-{
-	bool operator< (const vector3df &other) const { return X<other.X && Y<other.Y && Z<other.Z;};
-}
-%}*/
-/*%inline %{
-vector3df
-{
-	bool operator< (const vector3df &other) const { return X<other.X && Y<other.Y && Z<other.Z;};
-}
-%}*/
 %template(vector3dfarray) irr::core::array<vector3df>;
 
-//%template(vector3dfarray) irr::core::array<irr::core::vector3df>;
+//%template(EIntersectionRelation3DMap) irr::core::map<EIntersectionRelation3D, EIntersectionRelation3D>; // 1.3
+
 %template(dimension2df) irr::core::dimension2d<f32>;
 %template(dimension2di) irr::core::dimension2d<s32>;
 //%template(line2df) irr::core::line2d<f32>;
@@ -368,28 +401,34 @@ vector3df
 %template(ITextureArray) irr::core::array<irr::video::ITexture *>;
 //%template(ISceneNodeList) irr::core::list<irr::scene::ISceneNode *>;
 %template(IMeshArray) irr::core::array<irr::scene::IMesh *>;
-%template(S3DVertexArray) irr::core::array<irr::video::S3DVertex *>;
+//%template(S3DVertexCoreArray2) irr::core::array<irr::video::S3DVertex *>;
+%ignore irr::core::array<irr::video::S3DVertex>::binary_search;
+%ignore irr::core::array<irr::video::S3DVertex>::binary_search_const;
+%ignore irr::core::array<irr::video::S3DVertex>::linear_search;
+%ignore irr::core::array<irr::video::S3DVertex>::sort;
+%template(S3DVertexCoreArray) irr::core::array<irr::video::S3DVertex>;
 %template(u16Array) irr::core::array<u16>;
 //%template(IGUIElementList) irr::core::list<irr::gui::IGUIElement *>;
 //%template(IGUIElementListIterator) irr::core::Iterator<irr::gui::IGUIElement *>;
 //%template(ISceneNodeListIterator) irr::core::Iterator<irr::scene::ISceneNode *>;
 
-//typedef std::list<T> irr::core::list<T>
-
 %template(IXMLReader) irr::io::IIrrXMLReader<wchar_t, irr::IUnknown>;
-
 
 
 // Code extensions
 
+%extend irr::video::S3DVertex {
+	bool operator < (const S3DVertex& other) const
+	{
+		return (self->Pos < other.Pos);
+	}
+}
+
 %extend irr::video::SMaterial {
    bool isWireframe() {return self->Wireframe;};
-   bool isFlag(int material_flag) {return self->Flags[material_flag];};
-   void setFlag(int material_flag, bool value) {self->Flags[material_flag] = value;};
-   void setTexture(int index, ITexture* texture)
-   {
-     self->Textures[index] = texture;
-   } 
+   //bool isFlag(int material_flag) {return self->Flags[material_flag];};
+   //void setFlag(int material_flag, bool value) {self->Flags[material_flag] = value;};
+   void setTexture(int index, ITexture* texture) {self->Textures[index] = texture;};
 }
 
 %extend irr::SEvent {
@@ -416,25 +455,6 @@ vector3df
 	f32 getUserEventData3() {return self->UserEvent.UserData3;};
 }
 
-
-//%extend irr::scene::SMeshBuffer {
-//   void setMaterial(video::SMaterial* newMaterial)
-//   {
-//      self->Material = newMaterial;
-//   }
-//   void setVertices(core::array<video::S3DVertex>* newVertices)
-//   {
-//      Vertices= newVertices;
-//   }
-//   void setIndices(core::array<u16>* newIndices)
-//   {
-//      self->Indices = newIndices;
-//   }
-//   void setBoundingBox(core::aabbox3d<f32>* newBoundingBox)
-//   {
-//      self->BoundingBox = newBoundingBox;
-//   }
-//};
 %extend irr::scene::SMeshBuffer {
 
    void setMaterial(video::SMaterial& newMaterial)
@@ -445,11 +465,7 @@ vector3df
    {
       self->Indices = newIndices;
    }
-   void setBoundingBox(core::aabbox3d<f32>& newBoundingBox)
-   {
-      self->BoundingBox = newBoundingBox;
-   }
-//   void setVertices2(S3DVertexArray newVertices)
+//   void setVertices2(irr::core::array<irr::video::S3DVertex *> &newVertices )
 //   {
 //      self->Vertices = newVertices;
 //   }
@@ -457,55 +473,20 @@ vector3df
    {
       self->Vertices = newVertices;
    }
+//   void setVertices3(S3DVertex[] newVertices)
+//   {
+//	  int size = sizeof(newVertices)/sizeof(S3DVertex)
+//      irr::core::array<irr::video::S3DVertex> s3dVertexArray = irr::core::array<irr::video::S3DVertex>(size);
+//	  for (int i = 0; i < size; i++)
+//	  {
+//		s3dVertexArray.push_back(newVertices[i]);
+//	  }
+//	  
+//      self->Vertices = &s3dVertexArray;
+//   }
 }
 
 %extend irr::video::IVideoDriver {
-	//nosuccess
-	void drawIndexedTriangleList(bool a, S3DVertex vertices[],
-		s32 vertexCount, const u16* indexList, s32 triangleCount)
-			{self->drawIndexedTriangleList(vertices, vertexCount,indexList,triangleCount);};
-
-	// silly example
-	void drawIndexedTriangleList(int a, S3DVertex vertices[],
-		s32 vertexCount, const u16* indexList, s32 triangleCount)
-	{
-		S3DVertex Vertices[4];
-		
-		Vertices[0] = video::S3DVertex(0,0,10, 1,1,0, video::SColor(255,0,255,255), 0, 1);
-		Vertices[1] = video::S3DVertex(10,0,-10, 1,0,0, video::SColor(255,255,0,255), 1, 1);
-		Vertices[2] = video::S3DVertex(0,20,0, 0,1,1, video::SColor(255,255,255,0), 1, 0);
-		Vertices[3] = video::S3DVertex(-10,0,-10, 0,0,1, video::SColor(255,0,255,0), 0, 0);
-		self->drawIndexedTriangleList(Vertices, vertexCount, indexList, triangleCount);
-	};
-
-	void drawIndexedTriangleList(float pos[], float normal[], int colors[], float tcoords[],
-		s32 vertexCount, const u16* indexList, s32 triangleCount)
-	{
-		S3DVertex Vertices[vertexCount];
-		
-		for (int i = 0; i < vertexCount; i++)
-		{
-			Vertices[i] = video::S3DVertex(pos[i*3], pos[i*3+1], pos[i*3+2],
-													 normal[i*3], normal[i*3+1], normal[i*3+2],
-													 video::SColor(colors[i*4], colors[i*4+1], colors[i*4+2], colors[i*4+3]),
-													 tcoords[i*3], tcoords[i*3+1]);
-		}
-		
-		self->drawIndexedTriangleList(Vertices, vertexCount, indexList, triangleCount);
-	};
-
-	//nosuccess
-	S3DVertex* createVertices(int length)
-	{
-		S3DVertex *array = new S3DVertex[length];
-		return array;
-	};
-	//nosuccess
-	void addToVertices(S3DVertex *vertices, S3DVertex *vertex, int pos)
-	{
-		S3DVertex *array = vertices;
-	      *(void **)&array[pos] = vertex;
-	};
 }
 
 %extend irr::scene::ISceneManager {
@@ -557,8 +538,6 @@ vector3df
 	};
 
 
-			
-			
 	ICameraSceneNode* addCameraSceneNodeFPS(ISceneNode* parent,
 														 f32 rotateSpeed,
 														 f32 moveSpeed,
@@ -582,20 +561,10 @@ vector3df
 		self->setMaterialType((E_MATERIAL_TYPE)type);
 	}
 
-//	virtual void setScale2(const core::vector3df v3df)
-//	{
-//	//		self->ISceneNode::setScale(v3df);
-//                core::vector3df vector;
-//		vector.X = 1;
-//		vector.Y = 1.0;
-//		vector.Z = 1;
-//		self->ISceneNode::setScale(vector);
-//	}
-	
-	void OnPreRenderFromJava()
+	void OnRegisterSceneNodeJava()
 	{
 		// no directors for this method
-		self->ISceneNode::OnPreRender();
+		self->ISceneNode::OnRegisterSceneNode();
 	}
 	
 	//nosuccess
@@ -628,4 +597,6 @@ vector3df
 	}
 }
 
-
+%extend irr::core::vector3d <class T> {
+//	bool operator<(const vector3d<T>&other) const { return self.X<other.X && self.Y<other.Y && selfZ<other.Z;};
+}

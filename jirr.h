@@ -127,8 +127,10 @@ namespace irr
 
 
 // INSERTED BY OAK
+
 namespace irr
 {
+/*
   extern "C" 
   {
     IrrlichtDevice* createDeviceJava(
@@ -150,12 +152,12 @@ namespace irr
                           vsync,
                           receiver);
     }
-	 
-    /*void swig_module_init()
+*/	 
+  /*void swig_module_init()
     {
       printf("swig_module_init (stub) called... \n");
     }*/
-  }
+//  }
 
 
   template <class T>
@@ -222,7 +224,79 @@ namespace irr
 		IGUIComboBox* castToIGUIComboBox(IGUIElement *guiElement)
 		{
 			return (IGUIComboBox*) guiElement;
+		}
+		
+/*		irr::video::SColor* castToSColorArray(void *textureLock, irr::video::ITexture *texture)
+		{
+			return (irr::video::SColor*) textureLock;
+		}
+/*		void* castSColorArrayToVoid(irr::video::SColor *textureLock)
+		{
+			return (void *) textureLock;
+		}*/
+		void* copySColorArrayToVoid(irr::video::SColor *textureBufferToCopy, core::dimension2d<s32> dim, void *textureLock)
+		{
+			video::SColor *buffer = (video::SColor *) textureLock;
+
+			int length = dim.Height * dim.Width;	
+			for (int i=0; i < length; i++)
+			{
+				buffer[i].color = textureBufferToCopy[i].color;
+			}
+			
+			return textureLock;
 		}		
+		void* copyInt32ArrayToVoid(int *textureBufferToCopy, core::dimension2d<s32> dim, void *textureLock)
+		{
+			video::SColor *buffer = (video::SColor *) textureLock;			
+
+			int length = dim.Height * dim.Width;		
+			for (int i=0; i < length; i++)
+			{
+				buffer[i].color = (u32)textureBufferToCopy[i];
+			}
+			
+			return textureLock;
+		}		
+		void* copyU32ArrayToVoid(unsigned int *textureBufferToCopy, core::dimension2d<s32> dim, void *textureLock)
+		{
+			video::SColor *buffer = (video::SColor *) textureLock;
+
+			int length = dim.Height * dim.Width;		
+			for (int i=0; i < length; i++)
+			{
+				buffer[i].color = (unsigned int) textureBufferToCopy[i];
+			}
+			
+			return textureLock;
+		}		
+		
+		signed char* castVoidToByteArray(void *textureLock, core::dimension2d<s32> dim)
+		{
+			return (signed char *) textureLock;
+		}
+/*		void* castByteArrayToVoid(signed char *textureLock)
+		{
+			return (void *) textureLock;
+		}*/
+		
+		unsigned int* castVoidToU32Array(void *textureLock, core::dimension2d<s32> dim)
+		{
+			return (unsigned int *) textureLock;
+		}
+/*		void* castU32ArrayToVoid(unsigned int *textureLock)
+		{
+			return (void *) textureLock;
+		}*/
+
+		int* castVoidToInt32Array(void *textureLock, core::dimension2d<s32> dim)
+		{
+			return (int *) textureLock;
+		}
+/*		void* castInt32ArrayToVoid(int *textureLock)
+		{
+			return (void *) textureLock;
+		}*/
 	}
 }
 
