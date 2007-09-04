@@ -42,7 +42,7 @@ IRRLICHT_LDFLAGS=-L$(IRRLICHT_LIBDIR)  -lIrrlicht
 ifeq ($(OS), win32)
 IRRLICHT_LDFLAGS+=-lgdi32 -lglu32 -lopengl32
 else
-IRRLICHT_LDFLAGS+=-L/usr/X11R6/lib -lX11 -lGL -lXxf86vm -lXext -lc
+IRRLICHT_LDFLAGS+=-L/usr/X11R6/lib -lX11 -lGLU -lGL -lXxf86vm -lXext -lc
 endif
 ifeq ($(OS), win32)
 #IRRLICHT_CFLAGS=-I$(IRRLICHT_INCDIR) -mno-cygwin -shared 
